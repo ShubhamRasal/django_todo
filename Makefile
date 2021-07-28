@@ -55,7 +55,7 @@ publish:
 
 deploy:
 	${INFO} "Deploying $(READ_IMAGE_NAME) ..."
-	@cd ansible && ansible-playbook site.yml -e 'service_image_name=$(shell cat tag.tmp)'
+	@cd ansible && ansible-playbook site.yml -e 'service_image_name=$(shell cat tag.tmp)' --vault-password-file=$$vault_pass_file 
 
 clean:
 	${INFO} "Destroying development environment..."
