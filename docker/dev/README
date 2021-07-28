@@ -1,0 +1,2 @@
+Development Image purpose is to run the unit test and generate the build artifacts 
+which will be used in release docker image

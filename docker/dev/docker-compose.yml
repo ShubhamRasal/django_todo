@@ -1,0 +1,44 @@
+version: "3.3"
+
+volumes:
+    build:
+    cache:
+        external: true
+    
+services:
+    test:
+        build:  
+            context: ../../
+            dockerfile: ./docker/dev/Dockerfile
+        volumes:
+            - build:/build
+            - cache:/cache
+        links: 
+        - db
+        environment: 
+            DJANGO_SETTINGS_MODULE: django_todo.settings.test
+            DB_NAME: postgres
+            DB_USER: postgres
+            DB_PASSWORD: postgres
+            DB_HOST: db
+            DB_PORT: 5432
+            TEST_OUTPUT_DIR: /reports 
+
+    builder:
+        build: 
+            context: ../../
+            dockerfile: docker/dev/Dockerfile
+        volumes:
+            - build:/build
+        entrypoint: "entrypoint.sh"
+        command: ["pip", "wheel", "--no-index", "-f /build", "."]
+
+    db: 
+        image: postgres
+        hostname: db
+        expose: 
+            - "5432"
+        environment:
+        - POSTGRES_DB=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
