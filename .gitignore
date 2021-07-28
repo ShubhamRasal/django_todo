@@ -1,0 +1,23 @@
+# database dir
+data
+
+# env files
+.env
+
+#Ignore Compiled Python bytecode
+*.py[cod]
+
+#Ignore the virutal environment
+venv
+
+#Ignore SQLite database files
+*.sqlite3
+
+#Ignore target 
+target
+
+# Ignore reports
+reports
+
+# Ignore image tag file
+tag.tmp

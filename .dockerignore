@@ -1,0 +1,13 @@
+data
+
+docker-compose.yml
+
+Dockerfile
+
+README.md
+
+# Ignore the docker file
+docker
+
+# Ignore the virutal environment
+venv
