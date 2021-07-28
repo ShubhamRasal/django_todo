@@ -1,0 +1,63 @@
+- hosts: _server
+  serial: 1
+  vars_files:
+  - app_vars.yml
+  - db_vars.yml
+  pre_tasks:
+  - name: Deregister a target from a target group
+    community.aws.elb_target:
+      target_group_name: "{{ aws_target_group }}"
+      target_id: "{{instance_id}}"
+      state: absent
+      target_status: unused
+      target_status_timeout: 60
+    register: result
+    delegate_to: localhost
+    become: False
+
+  - name: target was deregistered
+    assert:
+        that:
+        - result.changed
+    ignore_errors: yes
+    delegate_to: localhost
+  
+  tasks:
+  - debug: 
+       var: service_image_name
+  - name: "launch {{service_container_name}} docker container"
+    docker_container:
+       name: "{{service_container_name}}"
+       image: "{{service_image_name}}"
+       state: started
+       restart_policy: always
+       ports:
+       - "{{host_container_published_port}}:{{service_container_published_port}}"
+       env:
+          DB_NAME="{{database_name}}"
+          DB_USER="{{database_user}}"
+          DB_PASSWORD="{{database_password}}"
+          DB_HOST="{{database_url}}"
+          DB_PORT="{{database_port}}"
+
+  post_tasks:
+  - name: register an instance to used target group and wait until healthy again 
+    elb_target:
+      target_group_name: "{{ aws_target_group }}"
+      target_id: "{{instance_id}}"
+      state: present
+      target_status: healthy
+      target_status_timeout: 200
+    register: result
+    delegate_to: localhost
+    become: False
+
+  - name: target is registered
+    assert:
+      that:
+      - result.changed
+      - result.target_group_arn
+      # - "'{{ result.target_health_descriptions.target.id }}' == '{{ instance_id }}'"
+      - "{{ result.target_health_descriptions.target_health }} == {'state': 'healthy'}"
+    delegate_to: localhost
+    become: False

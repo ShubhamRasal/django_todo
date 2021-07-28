@@ -1,0 +1,7 @@
+aws_target_group: "ll-dev-terra-dev-web-service-tg"
+service_container_name: "todobackend"
+# service_image_name: "registry.postsocially.com/todobackend/myapp"
+service_container_published_port: "80"
+host_container_published_port: "80"
+database_name: postgres
+database_port: 5432
